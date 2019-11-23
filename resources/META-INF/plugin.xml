@@ -1,0 +1,52 @@
+<idea-plugin version="2">
+    <id>com.ifetch.cq.mapper.generator.plugin</id>
+    <name>MapperGeneratorPlugin</name>
+    <version>1.0</version>
+    <vendor email="ifetch@126.com" url="https://github.com/ifetch">一棵松</vendor>
+
+    <description>
+        1.生成数据库mapper文件的插件
+        2.节省开发人员在项目搭建过程中使用在mapper.xml 文件上的时间
+    </description>
+
+    <change-notes><![CDATA[
+      Add change notes here.<br>
+      <em>most HTML tags may be used</em>
+    ]]>
+    </change-notes>
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+    <idea-version since-build="160.0"/>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+         on how to target different products -->
+    <!-- uncomment to enable plugin in all products
+    <depends>com.intellij.modules.lang</depends>
+    -->
+    <project-components>
+        <component>
+            <implementation-class>com.ifetch.cq.config.MyProjectComponent</implementation-class>
+        </component>
+    </project-components>
+
+
+    <module-components>
+        <component>
+            <implementation-class>com.ifetch.cq.config.MyModuleComponent</implementation-class>
+        </component>
+    </module-components>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Add your extensions here -->
+        <projectService serviceInterface="com.ifetch.cq.config.DatabaseSettings"
+                        serviceImplementation="com.ifetch.cq.config.DatabaseSettings"/>
+    </extensions>
+
+    <actions>
+        <!-- Add your actions here -->
+        <action id="MapperGenerator" class="com.ifetch.cq.action.MybatisGeneratorPlugin"
+                text="Mapper Generator..." description="数据库mapper生成工具">
+            <add-to-group group-id="ToolsMenu" anchor="first"/>
+        </action>
+    </actions>
+
+</idea-plugin>
