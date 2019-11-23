@@ -651,8 +651,8 @@ public abstract class MapperGeneratorDialog extends DialogWrapper {
             if (module == null) {
                 return;
             }
-            VirtualFile parentFile = module.getModuleFile().getParent();
-            VirtualFile file = parentFile.findFileByRelativePath(srcPath);
+            VirtualFile moduleFile = getModuleFile(module);
+            VirtualFile file = moduleFile.findFileByRelativePath(srcPath);
             FileChooserDescriptor descriptor = new MyFileChooserDescriptor();
             String baseDir = file == null ? "" : file.getPath();
             descriptor.setRoots(file);
@@ -791,6 +791,21 @@ public abstract class MapperGeneratorDialog extends DialogWrapper {
         constraints.gridx = c;
         constraints.fill = GridBagConstraints.HORIZONTAL;
         return constraints;
+    }
+
+    public static VirtualFile getModuleFile(Module module) {
+        if (module == null) {
+            return null;
+        }
+        String moduleName = module.getName();
+        VirtualFile file = module.getModuleFile();
+        while (file != null) {
+            if (moduleName.equals(file.getName())) {
+                return file;
+            }
+            file = file.getParent();
+        }
+        return null;
     }
 
 }
