@@ -23,7 +23,7 @@ public class MybatisGeneratorPlugin extends AnAction {
                 _LOG.error("mapper generator plugin error e:" + e.getMessage(), e);
             }
         } else {
-            _LOG.error("mapper generator plugin error 未选中项目");
+            _LOG.error("mapper generator plugin error 请先打开项目");
         }
     }
 }

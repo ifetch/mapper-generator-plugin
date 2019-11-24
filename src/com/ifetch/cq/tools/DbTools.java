@@ -56,7 +56,6 @@ public class DbTools {
     }
 
     public static List<String> getTableNames(DatabaseConfig config) throws Exception {
-//        String url = getConnectionUrlWithSchema(config);
         try (Connection connection = getConnection(config)) {
             List<String> tables = new ArrayList<>();
             DatabaseMetaData md = connection.getMetaData();

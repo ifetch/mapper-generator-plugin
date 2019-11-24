@@ -51,13 +51,11 @@ public abstract class MapperGeneratorDialog extends DialogWrapper {
 
     protected Project myProject;
 
-    JBScrollPane leftPane;
-
-    JBScrollPane rightPane;
-
     Tree dbTree;
 
     JBPopupMenu dbMenu;
+
+    JBScrollPane leftPane, rightPane;
 
     protected ComboBox<String> boxEncode;
 
@@ -385,7 +383,7 @@ public abstract class MapperGeneratorDialog extends DialogWrapper {
         tree.setDragEnabled(false);
         tree.setEditable(false);
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-        tree.addMouseListener(new RightClickListener());
+        tree.addMouseListener(new DBTreeClickListener());
         final TreeSpeedSearch speedSearch = new TreeSpeedSearch(
                 tree, (object) -> {
             final Object userObject = ((DefaultMutableTreeNode) object.getLastPathComponent()).getUserObject();
@@ -416,13 +414,16 @@ public abstract class MapperGeneratorDialog extends DialogWrapper {
      * @return
      */
     protected boolean editTreeNode(DatabaseConfig config) {
+        DefaultTreeModel treeModel = (DefaultTreeModel) dbTree.getModel();
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) dbTree.getSelectionPath().getLastPathComponent();
         node.setUserObject(config);
+        treeModel.reload();
         return true;
     }
 
     protected boolean removeNode(DefaultTreeModel parentModel, DefaultMutableTreeNode treeNode) {
         parentModel.removeNodeFromParent(treeNode);
+        parentModel.reload();
         return true;
     }
 
@@ -487,7 +488,7 @@ public abstract class MapperGeneratorDialog extends DialogWrapper {
     /**
      * 右击事件
      */
-    class RightClickListener extends MouseAdapter {
+    class DBTreeClickListener extends MouseAdapter {
         @Override
         public void mouseClicked(MouseEvent e) {
             // TODO Auto-generated method stub
@@ -509,7 +510,7 @@ public abstract class MapperGeneratorDialog extends DialogWrapper {
                 dbMenu = createDBConnectionMenu(isChild);
                 dbMenu.show(dbTree, x, y);
             } else if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
-                Result<Boolean> result = new Result<>(false);
+                Result<Boolean> result = new Result<>(true);
                 result.setT(false);
                 if (!isChild && (obj instanceof DatabaseConfig)) {
                     DatabaseConfig config = (DatabaseConfig) obj;
@@ -727,10 +728,6 @@ public abstract class MapperGeneratorDialog extends DialogWrapper {
 
     abstract List<DatabaseConfig> configs();
 
-    private Module[] getModules() {
-        return ModuleManager.getInstance(myProject).getModules();
-    }
-
     public void createRightFormHeader(JBPanel panel, GridBagLayout layout) {
         for (int i = 0; i < 33; i++) {
             JBPanel panel1 = new JBPanel();
@@ -759,13 +756,13 @@ public abstract class MapperGeneratorDialog extends DialogWrapper {
             Messages.showWarningDialog(getContentPanel(), "请自定义Java实体类名称", "提示");
             return false;
         } else if (StringTools.isEmpty(entityPackage)) {
-            Messages.showWarningDialog(getContentPanel(), "请选择java实体", "提示");
+            Messages.showWarningDialog(getContentPanel(), "请输入实体类文件存放包路径", "提示");
             return false;
         } else if (StringTools.isEmpty(interfaceName)) {
             Messages.showWarningDialog(getContentPanel(), "请自定义接口名称", "提示");
             return false;
         } else if (StringTools.isEmpty(interfacePath)) {
-            Messages.showWarningDialog(getContentPanel(), "请选择接口文件存放路径", "提示");
+            Messages.showWarningDialog(getContentPanel(), "请输入接口文件存放路径", "提示");
             return false;
         } else if (StringTools.isEmpty(xmlPath)) {
             Messages.showWarningDialog(getContentPanel(), "请选择xml文件存放路径", "提示");
@@ -806,6 +803,10 @@ public abstract class MapperGeneratorDialog extends DialogWrapper {
             file = file.getParent();
         }
         return null;
+    }
+
+    private Module[] getModules() {
+        return ModuleManager.getInstance(myProject).getModules();
     }
 
 }

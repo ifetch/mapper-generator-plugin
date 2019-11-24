@@ -37,7 +37,7 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
-        <projectService serviceInterface="com.ifetch.cq.config.DatabaseSettings"
+        <applicationService serviceInterface="com.ifetch.cq.config.DatabaseSettings"
                         serviceImplementation="com.ifetch.cq.config.DatabaseSettings"/>
     </extensions>
 
