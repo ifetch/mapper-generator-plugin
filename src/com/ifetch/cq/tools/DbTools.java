@@ -76,7 +76,7 @@ public class DbTools {
             List<String> tables = new ArrayList<>();
             DatabaseMetaData md = connection.getMetaData();
             ResultSet rs;
-            if (DbType.valueOf(config.getDbType()) == DbType.SQL_Server) {
+            if (DbType.valueOf(config.getDbType()) == DbType.SqlServer) {
                 String sql = "select name from sysobjects  where xtype='u' or xtype='v' ";
                 rs = connection.createStatement().executeQuery(sql);
                 while (rs.next()) {
