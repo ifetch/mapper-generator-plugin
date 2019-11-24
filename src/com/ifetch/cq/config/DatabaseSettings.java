@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
         name = "mapperGeneratorPlugin",
         storages = {
                 @Storage(
-                        file = "$PROJECT_CONFIG_DIR$/database_config.xml"
+                        file = "$APP_CONFIG$/database_config.xml"
                 )})
 public class DatabaseSettings implements PersistentStateComponent<Element> {
 
@@ -119,5 +119,8 @@ public class DatabaseSettings implements PersistentStateComponent<Element> {
 
     private static boolean isEmpty(String value) {
         return value == null || "".equals(value);
+    }
+
+    public DatabaseSettings() {
     }
 }

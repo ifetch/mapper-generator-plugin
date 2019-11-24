@@ -2,8 +2,11 @@ package com.ifetch.cq.tools;
 
 import com.ifetch.cq.model.DatabaseConfig;
 import com.ifetch.cq.model.DbType;
+import com.ifetch.cq.model.Result;
 import com.ifetch.cq.model.UITableColumnVO;
+import com.intellij.ide.plugins.cl.PluginClassLoader;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.project.Project;
 
 import java.sql.*;
 import java.util.*;
@@ -18,45 +21,58 @@ public class DbTools {
 
     private static Map<DbType, Driver> drivers = new HashMap<>();
 
-    static {
-        drivers = new HashMap<>();
-        DbType[] dbTypes = DbType.values();
-        for (DbType dbType : dbTypes) {
-            try {
-                Class clazz = Class.forName(dbType.getDriverClass());
-                Driver driver = (Driver) clazz.newInstance();
-                _LOG.info("load driver class:" + driver);
-                drivers.put(dbType, driver);
-            } catch (Exception e) {
-                _LOG.error("load driver error type:" + dbType, e);
-            }
+    public static Driver getDriver(Project project, DbType type) {
+        Driver driver = drivers.get(type);
+        if (driver != null) {
+            return driver;
         }
+        Class clazz = ConfigHelper.loadClass(project, type, (PluginClassLoader) type.getClass().getClassLoader());
+        if (clazz == null) {
+            throw new RuntimeException("请在项目中引入 " + type + "驱动包" + type.getConnectorJarFile() + ".jar");
+        }
+        try {
+            driver = (Driver) clazz.newInstance();
+            if (driver != null) {
+                drivers.put(type, driver);
+            }
+        } catch (Exception e) {
+            _LOG.error("load driver error type:" + type, e);
+        }
+        return driver;
     }
 
-    public static boolean testConnection(DatabaseConfig config) {
+    public static Result<Boolean> testConnection(Project project, DatabaseConfig config) {
+        Result<Boolean> result = new Result<>(true);
         try {
-            DbTools.getConnection(config);
+            DbTools.getConnection(project, config);
+            return result.setT(true);
         } catch (Exception e) {
             _LOG.error("testConnection:" + e.getMessage(), e);
-            return false;
+            result.setT(false).setDesc(e.getMessage());
         }
-        return true;
+        return result;
     }
 
-    public static Connection getConnection(DatabaseConfig config) throws ClassNotFoundException, SQLException {
+    public static Connection getConnection(Project project, DatabaseConfig config) throws ClassNotFoundException, SQLException {
+        DbType type = DbType.valueOf(config.getDbType());
         String url = getConnectionUrlWithSchema(config);
-        Properties props = new Properties();
 
+        Properties props = new Properties();
         props.setProperty("user", config.getUsername()); //$NON-NLS-1$
         props.setProperty("password", config.getPassword()); //$NON-NLS-1$
 
         DriverManager.setLoginTimeout(DB_CONNECTION_TIMEOUTS_SECONDS);
-        Connection connection = drivers.get(DbType.valueOf(config.getDbType())).connect(url, props);
+        Driver driver = getDriver(project, type);
+        if (driver == null) {
+            throw new RuntimeException("get db driver fail . dbType:" + type);
+        }
+        Connection connection = driver.connect(url, props);
         return connection;
     }
 
-    public static List<String> getTableNames(DatabaseConfig config) throws Exception {
-        try (Connection connection = getConnection(config)) {
+    public static List<String> getTableNames(Project project, DatabaseConfig config) throws Exception {
+        Connection connection = getConnection(project, config);
+        try {
             List<String> tables = new ArrayList<>();
             DatabaseMetaData md = connection.getMetaData();
             ResultSet rs;
@@ -82,11 +98,14 @@ public class DbTools {
                 tables.add(rs.getString(3));
             }
             return tables;
+        } finally {
+            connection.close();
         }
     }
 
-    public static List<UITableColumnVO> getTableColumns(DatabaseConfig dbConfig, String tableName) throws Exception {
-        try (Connection conn = getConnection(dbConfig)) {
+    public static List<UITableColumnVO> getTableColumns(Project project, DatabaseConfig dbConfig, String tableName) throws Exception {
+        Connection conn = getConnection(project, dbConfig);
+        try {
             DatabaseMetaData md = conn.getMetaData();
             ResultSet rs = md.getColumns(null, null, tableName, null);
             List<UITableColumnVO> columns = new ArrayList<>();
@@ -98,6 +117,8 @@ public class DbTools {
                 columns.add(columnVO);
             }
             return columns;
+        } finally {
+            conn.close();
         }
     }
 

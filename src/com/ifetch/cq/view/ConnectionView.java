@@ -2,12 +2,14 @@ package com.ifetch.cq.view;
 
 import com.ifetch.cq.model.DatabaseConfig;
 import com.ifetch.cq.model.DbType;
-import com.ifetch.cq.operate.ConnectionOperate;
-import com.ifetch.cq.operate.ConnectionOperateImpl;
+import com.ifetch.cq.model.Result;
+import com.ifetch.cq.plugins.ConnectionOperate;
+import com.ifetch.cq.plugins.ConnectionOperateImpl;
 import com.ifetch.cq.tools.DbTools;
 import com.ifetch.cq.tools.JTextFieldTools;
 import com.ifetch.cq.tools.PatternTools;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
@@ -35,18 +37,20 @@ public class ConnectionView extends DialogWrapper {
     private DatabaseConfig config;
 
     MapperGeneratorDialogImpl leftView;
+    Project myProject;
 
     private Long id;
 
     private JBPanel rootPanel;
 
-    public ConnectionView(MapperGeneratorDialogImpl leftView, DatabaseConfig config) {
+    public ConnectionView(Project project, MapperGeneratorDialogImpl leftView, DatabaseConfig config) {
         super(leftView.getContentPane(), true);
         id = null; //id要提前设置为null
         this.config = config;
-        connectionOperate = new ConnectionOperateImpl();
         this.leftView = leftView;
         setTitle("数据库配置");
+        myProject = project;
+        connectionOperate = leftView.getConnectionOperate();
         init();
     }
 
@@ -241,11 +245,11 @@ public class ConnectionView extends DialogWrapper {
             } else if ("cancelButton".equals(name)) {
                 connectionView.dispose();
             } else if ("testButton".equals(name) && isTrue) {
-                boolean connection = DbTools.testConnection(model);
-                if (connection) {
+                Result<Boolean> result = DbTools.testConnection(myProject, model);
+                if (result.getT()) {
                     Messages.showInfoMessage(connectionView.getContentPane(), "连接成功!", "提示");
                 } else {
-                    Messages.showErrorDialog(connectionView.getContentPane(), "连接失败!", "提示");
+                    Messages.showErrorDialog(connectionView.getContentPane(), result.getDesc(), "连接失败");
                 }
             }
         }

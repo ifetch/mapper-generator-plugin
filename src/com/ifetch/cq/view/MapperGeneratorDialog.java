@@ -3,7 +3,6 @@ package com.ifetch.cq.view;
 import com.ifetch.cq.model.DatabaseConfig;
 import com.ifetch.cq.model.GeneratorConfig;
 import com.ifetch.cq.model.Result;
-import com.ifetch.cq.tools.ImageUITools;
 import com.ifetch.cq.tools.JTextFieldTools;
 import com.ifetch.cq.tools.StringTools;
 import com.intellij.ide.ui.search.SearchUtil;
@@ -111,12 +110,8 @@ public abstract class MapperGeneratorDialog extends DialogWrapper {
     @Nullable
     @Override
     protected JComponent createNorthPanel() {
-        dbConnectionBtn = new JButton("数据库连接", ImageUITools.getImageIcon(ImageUITools.computer));
-        dbConnectionBtn.setFont(new Font("宋体", Font.BOLD, 12));
-        dbConnectionBtn.setHorizontalTextPosition(SwingConstants.CENTER);
-        dbConnectionBtn.setVerticalTextPosition(SwingConstants.BOTTOM);
-        dbConnectionBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        dbConnectionBtn.setBorderPainted(false);
+        dbConnectionBtn = new JButton("数据库连接");
+        dbConnectionBtn.setFont(new Font("宋体", Font.BOLD, 14));
 
         // 创建 一个工具栏实例
         JToolBar toolBar = new JToolBar();
@@ -124,12 +119,10 @@ public abstract class MapperGeneratorDialog extends DialogWrapper {
         toolBar.setOrientation(JToolBar.HORIZONTAL);
         toolBar.setBorderPainted(true);
         toolBar.setMargin(new Insets(4, 10, 4, 0));
-
         // 创建 工具栏按钮
         dbConnectionBtn.addMouseListener(new AddConnectionListener());
         // 添加 按钮 到 工具栏
         toolBar.setComponentZOrder(dbConnectionBtn, 0);
-
         return toolBar;
     }
 
@@ -485,13 +478,9 @@ public abstract class MapperGeneratorDialog extends DialogWrapper {
         }
     }
 
-    /**
-     * 右击事件
-     */
     class DBTreeClickListener extends MouseAdapter {
         @Override
         public void mouseClicked(MouseEvent e) {
-            // TODO Auto-generated method stub
             super.mouseClicked(e);
             JTree jTree = (JTree) e.getSource();
             if (jTree.getSelectionPath() == null) {
@@ -568,12 +557,13 @@ public abstract class MapperGeneratorDialog extends DialogWrapper {
             if (userObject instanceof DatabaseConfig) {
                 text = ((DatabaseConfig) userObject).getName();
                 style = SimpleTextAttributes.STYLE_BOLD;
-                this.setIcon(ImageUITools.dbImageIcon);
                 tree.setRowHeight(24);
+                tree.setFont(new Font(null, Font.BOLD, 13));
             } else {
                 text = userObject.toString();
-                this.setIcon(ImageUITools.tableImageIcon);
                 style = SimpleTextAttributes.STYLE_PLAIN;
+                tree.setRowHeight(24);
+                tree.setFont(new Font(null, Font.PLAIN, 12));
             }
 
             SearchUtil.appendFragments(mySpeedSearch.getEnteredPrefix(), text, style, foreground, background, this);
@@ -738,7 +728,7 @@ public abstract class MapperGeneratorDialog extends DialogWrapper {
 
     public String getParentUrl(ComboBox<Module> comboBox) {
         Module module = (Module) comboBox.getSelectedItem();
-        return module == null ? myProject.getBasePath() : module.getModuleFile().getParent().getPath();
+        return module == null ? myProject.getBasePath() : getModuleFile(module).getPath();
     }
 
     private boolean validateFormValue() {

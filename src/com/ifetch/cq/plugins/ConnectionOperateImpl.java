@@ -1,11 +1,11 @@
-package com.ifetch.cq.operate;
+package com.ifetch.cq.plugins;
 
-import com.ifetch.cq.config.MyProjectComponent;
 import com.ifetch.cq.model.DatabaseConfig;
 import com.ifetch.cq.config.DatabaseSettings;
 import com.ifetch.cq.tools.StringTools;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.project.Project;
 
 import java.util.*;
 import java.util.concurrent.locks.Lock;
@@ -25,8 +25,8 @@ public class ConnectionOperateImpl implements ConnectionOperate {
 
     DatabaseSettings databaseSettings;
 
-    public ConnectionOperateImpl() {
-        databaseSettings = ServiceManager.getService(MyProjectComponent.newInstance().getProject(), DatabaseSettings.class);
+    public ConnectionOperateImpl(Project project) {
+        databaseSettings = ServiceManager.getService(project, DatabaseSettings.class);
         _LOG.info("ConnectionOperateImpl");
     }
 

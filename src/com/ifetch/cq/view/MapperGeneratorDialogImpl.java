@@ -1,12 +1,9 @@
 package com.ifetch.cq.view;
 
 import com.ifetch.cq.bridge.MybatisGeneratorBridge;
-import com.ifetch.cq.model.DatabaseConfig;
-import com.ifetch.cq.model.GeneratorConfig;
-import com.ifetch.cq.model.Result;
-import com.ifetch.cq.model.UITableColumnVO;
-import com.ifetch.cq.operate.ConnectionOperate;
-import com.ifetch.cq.operate.ConnectionOperateImpl;
+import com.ifetch.cq.model.*;
+import com.ifetch.cq.plugins.ConnectionOperate;
+import com.ifetch.cq.plugins.ConnectionOperateImpl;
 import com.ifetch.cq.tools.ConfigHelper;
 import com.ifetch.cq.tools.DbTools;
 import com.ifetch.cq.tools.StringTools;
@@ -41,13 +38,13 @@ public class MapperGeneratorDialogImpl extends MapperGeneratorDialog {
 
     public MapperGeneratorDialogImpl(Project project) {
         super(project);
-        connectionOperate = new ConnectionOperateImpl();
+        connectionOperate = new ConnectionOperateImpl(myProject);
         init();
     }
 
     @Override
     Result<Boolean> addConnection() {
-        ConnectionView connectionView = new ConnectionView(this, null);
+        ConnectionView connectionView = new ConnectionView(myProject, this, null);
         connectionView.show();
         Result<Boolean> result = new Result<>(true);
         result.setT(true);
@@ -65,7 +62,7 @@ public class MapperGeneratorDialogImpl extends MapperGeneratorDialog {
     Result<Boolean> openConnection(DatabaseConfig config, DefaultMutableTreeNode treeNode) {
         Result<Boolean> result = new Result<>(true);
         try {
-            List<String> tables = DbTools.getTableNames(config);
+            List<String> tables = DbTools.getTableNames(myProject, config);
             if (tables != null && tables.size() > 0) {
                 treeNode.removeAllChildren();
                 for (String table : tables) {
@@ -88,7 +85,7 @@ public class MapperGeneratorDialogImpl extends MapperGeneratorDialog {
     Result<Boolean> editConnection(DatabaseConfig config) {
         Result<Boolean> result = new Result<>(true);
         result.setT(true);
-        ConnectionView connectionView = new ConnectionView(this, config);
+        ConnectionView connectionView = new ConnectionView(myProject, this, config);
         connectionView.show();
         return result;
     }
@@ -108,7 +105,7 @@ public class MapperGeneratorDialogImpl extends MapperGeneratorDialog {
     Result<Boolean> getTableInfo(String tableName, DatabaseConfig config) {
         Result<Boolean> result = new Result<>(true);
         try {
-            List<UITableColumnVO> columns = DbTools.getTableColumns(config, tableName);
+            List<UITableColumnVO> columns = DbTools.getTableColumns(myProject, config, tableName);
             setValue(tableName, StringTools.dbStringToCamelStyle(tableName), config, columns);
             result.setT(true);
         } catch (Exception err) {
@@ -185,6 +182,11 @@ public class MapperGeneratorDialogImpl extends MapperGeneratorDialog {
     }
 
     public String getConnectionLibPath(String dbType) {
-        return ConfigHelper.findConnectorLibPath(dbType, super.myProject);
+        DbType type = DbType.getByName(dbType);
+        return ConfigHelper.findConnectorLibPath(super.myProject, type);
+    }
+
+    public ConnectionOperate getConnectionOperate() {
+        return connectionOperate;
     }
 }

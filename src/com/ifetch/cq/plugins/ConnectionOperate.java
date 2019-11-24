@@ -1,4 +1,4 @@
-package com.ifetch.cq.operate;
+package com.ifetch.cq.plugins;
 
 import com.ifetch.cq.model.DatabaseConfig;
 

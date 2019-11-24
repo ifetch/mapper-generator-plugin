@@ -22,23 +22,11 @@
     <!-- uncomment to enable plugin in all products
     <depends>com.intellij.modules.lang</depends>
     -->
-    <project-components>
-        <component>
-            <implementation-class>com.ifetch.cq.config.MyProjectComponent</implementation-class>
-        </component>
-    </project-components>
-
-
-    <module-components>
-        <component>
-            <implementation-class>com.ifetch.cq.config.MyModuleComponent</implementation-class>
-        </component>
-    </module-components>
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
         <applicationService serviceInterface="com.ifetch.cq.config.DatabaseSettings"
-                        serviceImplementation="com.ifetch.cq.config.DatabaseSettings"/>
+                            serviceImplementation="com.ifetch.cq.config.DatabaseSettings"/>
     </extensions>
 
     <actions>
