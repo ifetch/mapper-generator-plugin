@@ -475,6 +475,7 @@ public abstract class MapperGeneratorDialog extends DialogWrapper {
                     }
                     break;
             }
+            rootModel.reload();
         }
     }
 
