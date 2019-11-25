@@ -656,15 +656,14 @@ public abstract class MapperGeneratorDialog extends DialogWrapper {
             if (chooseFilePath == null || "".equals(chooseFilePath)) {
                 return;
             }
-            String relativePath = chooseFilePath.replaceFirst(baseDir + File.separator, "");
             if (e.getSource() == file1) {
-                relativePath = relativePath.replace(File.separator, ".");
-                iEntityPackage.setText(relativePath);
+                chooseFilePath = chooseFilePath.replace(File.separator, ".");
+                iEntityPackage.setText(chooseFilePath);
             } else if (e.getSource() == file2) {
-                relativePath = relativePath.replace(File.separator, ".");
-                iInterfacePackage.setText(relativePath);
+                chooseFilePath = chooseFilePath.replace(File.separator, ".");
+                iInterfacePackage.setText(chooseFilePath);
             } else if (e.getSource() == file3) {
-                iXmlPackage.setText(relativePath);
+                iXmlPackage.setText(chooseFilePath);
             }
         }
 

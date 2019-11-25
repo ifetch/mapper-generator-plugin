@@ -515,7 +515,6 @@ public class FileProjectTreeView extends DialogWrapper implements FileChooserDia
 
     @Override
     protected void doOKAction() {
-        System.out.println("doOKAction");
         Object[] paths = myFileSystemTree.getTree().getSelectionPath().getPath();
         if (paths == null || paths.length <= 1) {
             chooseFilePath = "";
