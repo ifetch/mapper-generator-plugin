@@ -75,7 +75,7 @@ public class ConfigHelper {
             try {
                 File file = new File(url);
                 loader.addURL(file.toURL());
-                return loader.loadClass("com.mysql.jdbc.Driver");
+                return loader.loadClass(dbType.getDriverClass());
             } catch (Exception e) {
                 _LOG.error("class loader fail ." + url + "not found", e);
             }
