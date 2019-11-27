@@ -10,9 +10,11 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.module.impl.scopes.ModuleWithDependenciesScope;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.*;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.structuralsearch.plugin.ui.Configuration;
 import com.intellij.ui.ColoredTreeCellRenderer;
 import com.intellij.ui.JBSplitter;
@@ -36,6 +38,7 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -45,8 +48,6 @@ import java.util.List;
 public abstract class MapperGeneratorDialog extends DialogWrapper {
 
     private static final Logger _LOG = Logger.getInstance(MapperGeneratorDialog.class);
-
-    private static final String CODE_SRC_PATH = "/src/main/java/";
 
     protected Project myProject;
 
@@ -156,12 +157,12 @@ public abstract class MapperGeneratorDialog extends DialogWrapper {
         config.setTableName(iTableName.getText());
         config.setProjectPath(myProject.getBasePath());
         config.setEntityName(iEntityName.getText());
-        config.setEntityPath(getParentUrl(mEntityPath) + CODE_SRC_PATH);
+        config.setEntityPath(getSelectModuleUrl(mEntityPath, true));
         config.setEntityPackage(iEntityPackage.getText());
         config.setMapperName(iInterfaceName.getText());
-        config.setMapperPath(getParentUrl(mInterfacePath) + CODE_SRC_PATH);
+        config.setMapperPath(getSelectModuleUrl(mInterfacePath, true));
         config.setMapperPackage(iInterfacePackage.getText());
-        config.setXmlPath(getParentUrl(mXmlPath));
+        config.setXmlPath(getSelectModuleUrl(mXmlPath, false));
         config.setXmlPackage(iXmlPackage.getText());
 
         config.setEncoding(boxEncode.getSelectedItem() + "");
@@ -625,26 +626,23 @@ public abstract class MapperGeneratorDialog extends DialogWrapper {
          */
         @Override
         public void actionPerformed(ActionEvent e) {
-            String srcPath = "";
+//            String srcPath = "";
             Module module = null;
             String title = "请选择";
+            VirtualFile file = null;
             if (e.getSource() == file1) {
-                srcPath = CODE_SRC_PATH;
                 title = lEntityPackage.getText();
                 module = (Module) mEntityPath.getSelectedItem();
+                file = getModuleJavaFile(module);
             } else if (e.getSource() == file2) {
-                srcPath = CODE_SRC_PATH;
                 title = lInterfacePackage.getText();
                 module = (Module) mInterfacePath.getSelectedItem();
+                file = getModuleJavaFile(module);
             } else if (e.getSource() == file3) {
                 title = lXmlPackage.getText();
                 module = (Module) mXmlPath.getSelectedItem();
+                file = getModuleFile(module);
             }
-            if (module == null) {
-                return;
-            }
-            VirtualFile moduleFile = getModuleFile(module);
-            VirtualFile file = moduleFile.findFileByRelativePath(srcPath);
             FileChooserDescriptor descriptor = new MyFileChooserDescriptor();
             String baseDir = file == null ? "" : file.getPath();
             descriptor.setRoots(file);
@@ -726,9 +724,16 @@ public abstract class MapperGeneratorDialog extends DialogWrapper {
         }
     }
 
-    public String getParentUrl(ComboBox<Module> comboBox) {
+    public String getSelectModuleUrl(ComboBox<Module> comboBox, boolean flag) {
         Module module = (Module) comboBox.getSelectedItem();
-        return module == null ? myProject.getBasePath() : getModuleFile(module).getPath();
+        if (module == null) {
+            return myProject.getBasePath();
+        }
+        if (flag) {
+            return getModuleJavaFile(module).getPath();
+        } else {
+            return getModuleFile(module).getPath();
+        }
     }
 
     private boolean validateFormValue() {
@@ -780,17 +785,32 @@ public abstract class MapperGeneratorDialog extends DialogWrapper {
         return constraints;
     }
 
+    public static VirtualFile getModuleJavaFile(Module module) {
+        if (module == null) {
+            return null;
+        }
+        GlobalSearchScope scope = module.getModuleScope(false);
+        if (scope != null && scope instanceof ModuleWithDependenciesScope) {
+            ModuleWithDependenciesScope moduleScope = (ModuleWithDependenciesScope) scope;
+            Collection<VirtualFile> directories = moduleScope.getRoots();
+            if (directories != null && !directories.isEmpty()) {
+                return directories.iterator().next();
+            }
+        }
+        return null;
+    }
+
     public static VirtualFile getModuleFile(Module module) {
         if (module == null) {
             return null;
         }
-        String moduleName = module.getName();
-        VirtualFile file = module.getModuleFile();
-        while (file != null) {
-            if (moduleName.equals(file.getName())) {
-                return file;
+        GlobalSearchScope scope = module.getModuleContentScope();
+        if (scope != null && scope instanceof ModuleWithDependenciesScope) {
+            ModuleWithDependenciesScope moduleScope = (ModuleWithDependenciesScope) scope;
+            Collection<VirtualFile> directories = moduleScope.getRoots();
+            if (directories != null && !directories.isEmpty()) {
+                return directories.iterator().next();
             }
-            file = file.getParent();
         }
         return null;
     }
