@@ -33,11 +33,25 @@ public class GeneratorConfig implements Serializable {
 
     private String xmlPackage;
 
+    private boolean useExample;
+
     private boolean needPage;
 
     private boolean needComment;
 
+    private boolean coverXml;
+
+    private boolean useLombokPlugin;
+
     private boolean needToStringHashcodeEquals;
+
+    private boolean useJSR310;
+
+    private boolean useForUpdate;
+
+    private boolean useDaoPublicMethod;
+
+    private boolean daoRepository;
 
     private boolean jpaAnnotation;
 
@@ -47,6 +61,8 @@ public class GeneratorConfig implements Serializable {
     private boolean useActualColumnNames;
 
     private String encoding;
+
+    private boolean useSchema;
 
     public String getId() {
         return id;
@@ -136,6 +152,14 @@ public class GeneratorConfig implements Serializable {
         this.xmlPackage = xmlPackage;
     }
 
+    public boolean isUseExample() {
+        return useExample;
+    }
+
+    public void setUseExample(boolean useExample) {
+        this.useExample = useExample;
+    }
+
     public boolean isNeedPage() {
         return needPage;
     }
@@ -152,12 +176,60 @@ public class GeneratorConfig implements Serializable {
         this.needComment = needComment;
     }
 
+    public boolean isCoverXml() {
+        return coverXml;
+    }
+
+    public void setCoverXml(boolean coverXml) {
+        this.coverXml = coverXml;
+    }
+
+    public boolean isUseLombokPlugin() {
+        return useLombokPlugin;
+    }
+
+    public void setUseLombokPlugin(boolean useLombokPlugin) {
+        this.useLombokPlugin = useLombokPlugin;
+    }
+
     public boolean isNeedToStringHashcodeEquals() {
         return needToStringHashcodeEquals;
     }
 
     public void setNeedToStringHashcodeEquals(boolean needToStringHashcodeEquals) {
         this.needToStringHashcodeEquals = needToStringHashcodeEquals;
+    }
+
+    public boolean isUseJSR310() {
+        return useJSR310;
+    }
+
+    public void setUseJSR310(boolean useJSR310) {
+        this.useJSR310 = useJSR310;
+    }
+
+    public boolean isUseForUpdate() {
+        return useForUpdate;
+    }
+
+    public void setUseForUpdate(boolean useForUpdate) {
+        this.useForUpdate = useForUpdate;
+    }
+
+    public boolean isUseDaoPublicMethod() {
+        return useDaoPublicMethod;
+    }
+
+    public void setUseDaoPublicMethod(boolean useDaoPublicMethod) {
+        this.useDaoPublicMethod = useDaoPublicMethod;
+    }
+
+    public boolean isDaoRepository() {
+        return daoRepository;
+    }
+
+    public void setDaoRepository(boolean daoRepository) {
+        this.daoRepository = daoRepository;
     }
 
     public boolean isJpaAnnotation() {
@@ -182,5 +254,13 @@ public class GeneratorConfig implements Serializable {
 
     public void setEncoding(String encoding) {
         this.encoding = encoding;
+    }
+
+    public boolean isUseSchema() {
+        return useSchema;
+    }
+
+    public void setUseSchema(boolean useSchema) {
+        this.useSchema = useSchema;
     }
 }

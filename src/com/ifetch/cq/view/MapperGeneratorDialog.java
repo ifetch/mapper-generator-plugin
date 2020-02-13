@@ -57,7 +57,7 @@ public abstract class MapperGeneratorDialog extends DialogWrapper {
 
     JBScrollPane leftPane, rightPane;
 
-    protected ComboBox<String> boxEncode;
+//    protected ComboBox<String> boxEncode;
 
     protected static final JBLabel sEntity, sMapper, sXml, sOther;
 
@@ -67,11 +67,11 @@ public abstract class MapperGeneratorDialog extends DialogWrapper {
 
     protected JButton file1, file2, file3, bMadeColumn, bGeneratorCode, dbConnectionBtn;
 
-    protected JBCheckBox cPage, cComment, cGeneratorMethod, cGeneratorAtonnotation, cTryColumn;
+    protected JBCheckBox cUseExample, cPage, cComment, cCoverXml, cLombokPlugin, cGeneratorMethod, cUseSchema, cForUpdate, cDaoAtonnotation, cDaoPublicMethod, cJsr310, cGeneratorAtonnotation, cTryColumn;
 
     protected JBTextField iTableName, iId, iEntityName, iEntityPackage, iInterfaceName, iInterfacePackage, iXmlPackage;
 
-    protected static final JBLabel lEncode, lTableName, lId, lEntityName, lEntityPath, lInterfaceName, lInterFacePath, lXmlPath, lEntityPackage, lInterfacePackage, lXmlPackage;
+    protected static final JBLabel lTableName, lId, lEntityName, lEntityPath, lInterfaceName, lInterFacePath, lXmlPath, lEntityPackage, lInterfacePackage, lXmlPackage;
 
     static {
         jEntity = new JSeparator();
@@ -91,16 +91,15 @@ public abstract class MapperGeneratorDialog extends DialogWrapper {
         lId = new JBLabel("主键(选填)");
         lEntityName = new JBLabel("实体类名");
         lInterfaceName = new JBLabel("接口名称");
-        lEncode = new JBLabel("生成文件编码");
 
         sEntity = new JBLabel("Entity");
         sMapper = new JBLabel("Interface");
         sXml = new JBLabel("Xml");
-        sOther = new JBLabel("Other");
+        sOther = new JBLabel("Option");
     }
 
     public MapperGeneratorDialog(Project project) {
-        super(project);
+        super(project, false);
         this.myProject = project;
         //初始化对象
         renderForm(getModules());
@@ -151,6 +150,11 @@ public abstract class MapperGeneratorDialog extends DialogWrapper {
         return this.rightPane;
     }
 
+    /**
+     * 获取表单值
+     *
+     * @return
+     */
     public GeneratorConfig getGeneratorConfigFromUI() {
         GeneratorConfig config = new GeneratorConfig();
         config.setId(iId.getText());
@@ -165,14 +169,23 @@ public abstract class MapperGeneratorDialog extends DialogWrapper {
         config.setXmlPath(getSelectModuleUrl(mXmlPath, false));
         config.setXmlPackage(iXmlPackage.getText());
 
-        config.setEncoding(boxEncode.getSelectedItem() + "");
+        config.setEncoding("utf-8");
+        config.setUseExample(cUseExample.isSelected());
         config.setNeedPage(cPage.isSelected());
+        config.setNeedComment(cComment.isSelected());
+        config.setCoverXml(cCoverXml.isSelected());
+        config.setUseLombokPlugin(cLombokPlugin.isSelected());
+        config.setNeedToStringHashcodeEquals(cGeneratorMethod.isSelected());
+        config.setUseJSR310(cJsr310.isSelected());
+        config.setUseForUpdate(cForUpdate.isSelected());
+        config.setUseDaoPublicMethod(cDaoPublicMethod.isSelected());
+        config.setDaoRepository(cDaoAtonnotation.isSelected());
         config.setJpaAnnotation(cGeneratorAtonnotation.isSelected());
         config.setUseActualColumnNames(cTryColumn.isSelected());
-        config.setNeedComment(cComment.isSelected());
-        config.setNeedToStringHashcodeEquals(cGeneratorMethod.isSelected());
+        config.setUseSchema(cUseSchema.isSelected());
         return config;
     }
+
 
     public void renderForm(Module[] modules) {
         JBPanel jPanel = new JBPanel();
@@ -187,12 +200,34 @@ public abstract class MapperGeneratorDialog extends DialogWrapper {
         iInterfaceName = JTextFieldTools.createJBTextField("interfaceName");
         iInterfacePackage = JTextFieldTools.createJBTextField("interfacePath");
         iXmlPackage = JTextFieldTools.createJBTextField("xmlPath");
-        cPage = new JBCheckBox("分页", true);
+
+        cUseExample = new JBCheckBox("使用Example");// newObject
+        cPage = new JBCheckBox("分页(仅支持MySql和PostgreSql)", true);
+        cPage.setEnabled(cUseExample.isSelected());
+        cUseExample.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (e.getSource() instanceof JBCheckBox) {
+                    boolean isSelect = ((JBCheckBox) e.getSource()).isSelected();
+                    cPage.setEnabled(isSelect);
+                }
+            }
+        });
         cComment = new JBCheckBox("生成实体类注释(表注释)", true);
+        cCoverXml = new JBCheckBox("覆盖原XML", true);
+
+        cLombokPlugin = new JBCheckBox("LombokPlugin");
         cGeneratorMethod = new JBCheckBox("生成toString,equals,hasCode方法", true);
+        cUseSchema = new JBCheckBox("使用schema前缀");
+
+        cForUpdate = new JBCheckBox("select增加ForUpdate");
+        cJsr310 = new JBCheckBox("JSR310:Date And Time API", true);
+
+        cDaoAtonnotation = new JBCheckBox("Mapper使用@Repository注解");
+        cDaoPublicMethod = new JBCheckBox("Mapper方法抽象到父类", true);
+
         cGeneratorAtonnotation = new JBCheckBox("生成JPA注解");
         cTryColumn = new JBCheckBox("使用实际列名");
-        boxEncode = new ComboBox<>(new String[]{"utf-8"});
 
         file1 = new JButton("选择");
         file2 = new JButton("选择");
@@ -220,7 +255,6 @@ public abstract class MapperGeneratorDialog extends DialogWrapper {
         jPanel.add(lInterfacePackage);
         jPanel.add(lXmlPath);
         jPanel.add(lXmlPackage);
-        jPanel.add(lEncode);
 
         jPanel.add(iId);
         jPanel.add(iTableName);
@@ -242,13 +276,28 @@ public abstract class MapperGeneratorDialog extends DialogWrapper {
         jPanel.add(sMapper);
         jPanel.add(sXml);
         jPanel.add(bMadeColumn);
-        jPanel.add(bGeneratorCode);
+
+        jPanel.add(cUseExample);
         jPanel.add(cPage);
+
         jPanel.add(cComment);
+        jPanel.add(cCoverXml);
+
+        jPanel.add(cLombokPlugin);
+        jPanel.add(cUseSchema);
         jPanel.add(cGeneratorMethod);
+
+        jPanel.add(cJsr310);
+        jPanel.add(cForUpdate);
+
+        jPanel.add(cDaoPublicMethod);
+        jPanel.add(cDaoAtonnotation);
+
         jPanel.add(cGeneratorAtonnotation);
         jPanel.add(cTryColumn);
-        jPanel.add(boxEncode);
+
+        jPanel.add(bGeneratorCode);
+
         jPanel.add(file1);
         jPanel.add(file2);
         jPanel.add(file3);
@@ -302,17 +351,26 @@ public abstract class MapperGeneratorDialog extends DialogWrapper {
         layout.setConstraints(sOther, cell(14, 0, 3, GridBagConstraints.EAST));
         layout.setConstraints(jOther, cell(14, 3, 0));
 
-        layout.setConstraints(lEncode, cell(15, 1, 7, GridBagConstraints.EAST));
-        layout.setConstraints(boxEncode, cell(15, 8, 15, GridBagConstraints.WEST));
+        layout.setConstraints(cUseExample, cell(15, 8, 10, GridBagConstraints.WEST));
+        layout.setConstraints(cPage, cell(15, 18, 20, GridBagConstraints.WEST));
 
-        layout.setConstraints(cPage, cell(16, 8, 5, GridBagConstraints.WEST));
-        layout.setConstraints(cComment, cell(16, 14, 16, GridBagConstraints.WEST));
+        layout.setConstraints(cComment, cell(16, 8, 14, GridBagConstraints.WEST));
+        layout.setConstraints(cCoverXml, cell(16, 22, 10, GridBagConstraints.WEST));
 
-        layout.setConstraints(cGeneratorMethod, cell(17, 8, 20, GridBagConstraints.WEST));
+        layout.setConstraints(cLombokPlugin, cell(17, 8, 10, GridBagConstraints.WEST));
+        layout.setConstraints(cGeneratorMethod, cell(17, 18, 20, GridBagConstraints.WEST));
 
-        layout.setConstraints(cGeneratorAtonnotation, cell(18, 8, 10, GridBagConstraints.WEST));
-        layout.setConstraints(cTryColumn, cell(18, 18, 15, GridBagConstraints.WEST));
-        layout.setConstraints(bGeneratorCode, cell(19, 8, 20, GridBagConstraints.WEST));
+        layout.setConstraints(cJsr310, cell(18, 8, 20, GridBagConstraints.WEST));
+        layout.setConstraints(cForUpdate, cell(18, 24, 16, GridBagConstraints.WEST));
+
+        layout.setConstraints(cDaoPublicMethod, cell(19, 8, 16, GridBagConstraints.WEST));
+        layout.setConstraints(cDaoAtonnotation, cell(19, 22, 20, GridBagConstraints.WEST));
+
+        layout.setConstraints(cGeneratorAtonnotation, cell(20, 8, 10, GridBagConstraints.WEST));
+        layout.setConstraints(cTryColumn, cell(20, 16, 15, GridBagConstraints.WEST));
+        layout.setConstraints(cUseSchema, cell(20, 24, 12, GridBagConstraints.WEST));
+
+        layout.setConstraints(bGeneratorCode, cell(21, 16, 20, GridBagConstraints.WEST));
 
         jPanel.setLayout(layout);
         rightPane = new JBScrollPane(jPanel);
@@ -422,7 +480,6 @@ public abstract class MapperGeneratorDialog extends DialogWrapper {
     }
 
     class AddConnectionListener extends MouseAdapter {
-
         @Override
         public void mouseClicked(MouseEvent e) {
             addConnection();
@@ -700,24 +757,8 @@ public abstract class MapperGeneratorDialog extends DialogWrapper {
         }
     }
 
-    abstract Result<Boolean> addConnection();
-
-    abstract Result<Boolean> openConnection(DatabaseConfig config, DefaultMutableTreeNode treeNode);
-
-    abstract Result<Boolean> editConnection(DatabaseConfig config);
-
-    abstract Result<Boolean> delConnection(DatabaseConfig config);
-
-    abstract Result<Boolean> getTableInfo(String tableName, DatabaseConfig config);
-
-    abstract Result<Boolean> madeTableColumn();
-
-    abstract Result<Boolean> generatorCode();
-
-    abstract List<DatabaseConfig> configs();
-
     public void createRightFormHeader(JBPanel panel, GridBagLayout layout) {
-        for (int i = 0; i < 33; i++) {
+        for (int i = 0; i < 38; i++) {
             JBPanel panel1 = new JBPanel();
             panel.add(panel1);
             layout.setConstraints(panel1, cell(0, i, 1));
@@ -785,6 +826,12 @@ public abstract class MapperGeneratorDialog extends DialogWrapper {
         return constraints;
     }
 
+    /**
+     * 获取 module 的文件根路径
+     *
+     * @param module
+     * @return
+     */
     public static VirtualFile getModuleJavaFile(Module module) {
         if (module == null) {
             return null;
@@ -818,5 +865,21 @@ public abstract class MapperGeneratorDialog extends DialogWrapper {
     private Module[] getModules() {
         return ModuleManager.getInstance(myProject).getModules();
     }
+
+    abstract Result<Boolean> addConnection();
+
+    abstract Result<Boolean> openConnection(DatabaseConfig config, DefaultMutableTreeNode treeNode);
+
+    abstract Result<Boolean> editConnection(DatabaseConfig config);
+
+    abstract Result<Boolean> delConnection(DatabaseConfig config);
+
+    abstract Result<Boolean> getTableInfo(String tableName, DatabaseConfig config);
+
+    abstract Result<Boolean> madeTableColumn();
+
+    abstract Result<Boolean> generatorCode();
+
+    abstract List<DatabaseConfig> configs();
 
 }

@@ -25,19 +25,19 @@ public class DatabaseSettings implements PersistentStateComponent<Element> {
 
     private static final Logger _LOG = Logger.getInstance(DatabaseSettings.class);
 
-    private static String SETTING = "setting";
-    private static String CONNECTION = "connection";
-    private static String ITEM = "item";
+    private static final String SETTING = "setting";
+    private static final String CONNECTION = "connection";
+    private static final String ITEM = "item";
 
-    private static String ID = "id";
-    private static String NAME = "connectionName";
-    private static String TYPE = "type";
-    private static String HOST = "host";
-    private static String PORT = "port";
-    private static String USERNAME = "username";
-    private static String PASSWORD = "password";
-    private static String SCHEMA = "schema";
-    private static String ENCODE = "encode";
+    private static final String ID = "id";
+    private static final String NAME = "connectionName";
+    private static final String TYPE = "type";
+    private static final String HOST = "host";
+    private static final String PORT = "port";
+    private static final String USERNAME = "username";
+    private static final String PASSWORD = "password";
+    private static final String SCHEMA = "schema";
+    private static final String ENCODE = "encode";
 
     private Map<String, DatabaseConfig> connections = new HashMap<>();
 
