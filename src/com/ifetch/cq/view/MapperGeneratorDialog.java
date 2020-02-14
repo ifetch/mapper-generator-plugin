@@ -57,8 +57,6 @@ public abstract class MapperGeneratorDialog extends DialogWrapper {
 
     JBScrollPane leftPane, rightPane;
 
-//    protected ComboBox<String> boxEncode;
-
     protected static final JBLabel sEntity, sMapper, sXml, sOther;
 
     protected static final JSeparator jEntity, jMapper, jXml, jOther;
@@ -99,9 +97,8 @@ public abstract class MapperGeneratorDialog extends DialogWrapper {
     }
 
     public MapperGeneratorDialog(Project project) {
-        super(project, false);
+        super(project, false,true);
         this.myProject = project;
-        //初始化对象
         renderForm(getModules());
         setTitle("生成mapper文件");
         setSize(840, 800);

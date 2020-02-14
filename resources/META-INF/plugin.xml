@@ -5,8 +5,9 @@
     <vendor email="ifetch@126.com" url="https://github.com/ifetch">一棵松</vendor>
 
     <description>
-        1.生成数据库mapper文件的插件
-        2.节省开发人员在项目搭建过程中使用在mapper.xml 文件上的时间
+        1.集成generator 插件 生成数据库 entity,mapper ,xml 文件
+        2.将generator插件配置做成可视化界面，减少繁琐的配置
+        3.在创建新应用引入数据库配置时可减少开发人员时间
     </description>
 
     <change-notes><![CDATA[
