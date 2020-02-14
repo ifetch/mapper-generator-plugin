@@ -43,6 +43,7 @@ mac: Preferences -> 左边菜单栏 选择 Plugins -> 右边选择 Install Plugi
 ​        安装完成后 选择顶部菜单栏->Tools ->  Mapper Generator…     显示如 图2
 
 ![ 图2](2.jpg)
+
 (图2)
 
 #### 使用手册
