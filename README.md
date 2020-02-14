@@ -66,28 +66,20 @@ mac: Preferences -> 左边菜单栏 选择 Plugins -> 右边选择 Install Plugi
 ##### 第三步:  完善右边表单中相关信息
 
  entity
-
 1. 自定义java pojo 文件名称
 2. 选择 pojo文件 存放的module
 3. 选择java pojo文件 存放的目录(可自定义,目录不存在会自动创建)
 
 interface
-
 1. 自定义mapper interface 文件名称
 2. 选择mapper interface 文件存放的 module
 3. 选择mapper interface 文件存放的目录 (可自定义,目录不存在会自动创建)
 
 xml
-
 1. 选择 xml 存放的module
 2. 选择xml 文件存放的目录(可自定义,目录不存在会自动创建) 
 
 option
-
-1. 选择你所需要的插件
+1. 选择你所需要的插件 － 按自己需求定制所需要的功能
 2. JSR310: Date And Time API 是将数据库中 表字段 datetime类型 转成java 8 的LocalDateTime
-3. 其他可按自己需求选择
 4. 点击代码生成 ，可去上面选择的目录 中查看对应的 pojo ,interface,xml
-
-
-
