@@ -86,7 +86,7 @@ option
 1. 选择你所需要的插件
 2. JSR310: Date And Time API 是将数据库中 表字段 datetime类型 转成java 8 的LocalDateTime
 3. 其他可按自己需求选择
-4. 点击代码生成 ，可取上面选择的目录中查看对应的 pojo ,interface,xml
+4. 点击代码生成 ，可去上面选择的目录 中查看对应的 pojo ,interface,xml
 
 
 
