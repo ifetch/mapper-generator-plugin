@@ -2,7 +2,7 @@
 
  [mapper-generator-plugin ](https://github.com/ifetch/mapper-generator-plugin)是集成[mybatis generator](http://www.mybatis.org/generator/index.html) 而开发的一款Intellij IDEA 界面工具。只需要在你的IDEA开发工具中安装该插件，就可以使你非常容易及快速生成Mybatis的Java POJO文件及数据库Mapping文件。
 
-![图1](./index.jpg)
+![图1](https://github.com/ifetch/mapper-generator-plugin/blob/master/3.jpg)
 
 ( 图1)
 
